@@ -1,7 +1,10 @@
 import { Body, Controller, Delete, Get, Logger, Param, Patch, Post } from '@nestjs/common';
+import { UsePipes } from '@nestjs/common/decorators';
+import { ValidationPipe } from '@nestjs/common/pipes';
 import { Board, BoardStatus } from './boards.model';
 import { BoardsService } from './boards.service';
 import { CreateBoardDto } from './dto/create-board.dto';
+import { BoardStatusValidationPipe } from './pipes/board-status-validation.pipe';
 
 @Controller('boards')
 export class BoardsController {
@@ -22,6 +25,7 @@ export class BoardsController {
 	 * 저장
 	 */
 	@Post()
+	@UsePipes(ValidationPipe)
 	createBoard(
 		@Body() createBoardDto: CreateBoardDto
 		): Board {		// @Body() body 이렇게 사용하면 모든 값 가져올 수 있다.
@@ -51,7 +55,7 @@ export class BoardsController {
 	@Patch('/:id/status')
 	updateBoardStatus(
 		@Param('id') id:string,
-		@Body('status') status: BoardStatus,
+		@Body('status', BoardStatusValidationPipe) status: BoardStatus,
 	) {
 		return this.boardsService.updateBoardStatus(id, status);
 	}
