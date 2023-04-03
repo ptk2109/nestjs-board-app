@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Logger, Param, Patch, Post } from '@nestjs/common';
 import { UsePipes } from '@nestjs/common/decorators';
-import { ValidationPipe } from '@nestjs/common/pipes';
+import { ParseIntPipe, ValidationPipe } from '@nestjs/common/pipes';
 import { BoardStatus } from './board-status.enum';
 import { Board } from './board.entity';
 import { BoardsService } from './boards.service';
@@ -11,13 +11,23 @@ import { BoardStatusValidationPipe } from './pipes/board-status-validation.pipe'
 export class BoardsController {
 	constructor(private boardsService: BoardsService){ }
 
+
+	/**
+	 * 전체 가져오기 
+	 */
+	@Get()
+    getAllBoard(
+    ): Promise<Board[]> {
+        return this.boardsService.getAllBoards();
+    }
+
 	/**
 	 * 하나의 데이터 가져오기 
 	 */
-	// @Get('/:id')
-	// getBoardById(@Param("id") id:number): Promise<Board> {
-	// 	return this.boardsService.getBoardById(id);
-	// }
+	@Get('/:id')
+	getBoardById(@Param('id') id: number): Promise<Board> {
+		return this.boardsService.getBoardById(id);
+	}
 
 	/**
 	 * 저장
@@ -25,11 +35,34 @@ export class BoardsController {
 	@Post()
 	@UsePipes(ValidationPipe)
 	createBoard(
-		@Body() createBoardDto: CreateBoardDto
+			@Body() createBoardDto: CreateBoardDto
 		): Promise<Board> {		// @Body() body 이렇게 사용하면 모든 값 가져올 수 있다.
 
 			return this.boardsService.createBoard(createBoardDto);
 	}
+
+/**
+ * 삭제
+ */
+	@Delete('/:id')
+	deleteBoard(
+			@Param('id', ParseIntPipe) id:number
+		): Promise<void> {
+
+
+		return this.boardsService.deleteBoard(id);
+	}
+
+	/**
+	 * 수정
+	 */
+	@Patch('/:id/status')
+    updateBoardStatus(
+        @Param('id', ParseIntPipe) id: number,
+        @Body('status', BoardStatusValidationPipe) status: BoardStatus
+    ) {
+        return this.boardsService.updateBoardStatus(id, status);
+    }
 
 	// /**
 	//  * 전체 가져오기
