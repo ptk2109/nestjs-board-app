@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Logger, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Logger, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { UsePipes } from '@nestjs/common/decorators';
 import { ParseIntPipe, ValidationPipe } from '@nestjs/common/pipes';
 import { BoardStatus } from './board-status.enum';
@@ -6,8 +6,12 @@ import { Board } from './board.entity';
 import { BoardsService } from './boards.service';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { BoardStatusValidationPipe } from './pipes/board-status-validation.pipe';
+import { AuthGuard } from '@nestjs/passport';
+import { GetUser } from 'src/auth/get-user.decorator';
+import { User } from 'src/auth/user.entity';
 
 @Controller('boards')
+@UseGuards(AuthGuard())
 export class BoardsController {
 	constructor(private boardsService: BoardsService){ }
 
@@ -35,10 +39,11 @@ export class BoardsController {
 	@Post()
 	@UsePipes(ValidationPipe)
 	createBoard(
-			@Body() createBoardDto: CreateBoardDto
+			@Body() createBoardDto: CreateBoardDto,
+			@GetUser() user:User
 		): Promise<Board> {		// @Body() body 이렇게 사용하면 모든 값 가져올 수 있다.
 
-			return this.boardsService.createBoard(createBoardDto);
+			return this.boardsService.createBoard(createBoardDto, user);
 	}
 
 /**

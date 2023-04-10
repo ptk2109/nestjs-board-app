@@ -5,6 +5,7 @@ import { TypeOrmExModule } from 'src/configs/typeorm/typeorm-ex.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UserRepository } from './user.repository';
+import { JwtStrategy } from './jwt.strategy';
 // import { JwtStrategy } from './jwt.strategy';
 // import * as config from 'config';
 // const jwtConfig = config.get('jwt');
@@ -28,7 +29,7 @@ import { UserRepository } from './user.repository';
     TypeOrmExModule.forCustomRepository([UserRepository])
   ],
   controllers: [AuthController],
-  providers: [AuthService],
-  // exports: [JwtStrategy, PassportModule]
+  providers: [AuthService, JwtStrategy],
+  exports: [JwtStrategy, PassportModule]
 })
 export class AuthModule {}
